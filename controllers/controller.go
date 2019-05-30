@@ -13,6 +13,7 @@ import (
 	"sort"
 	"sync"
 	"time"
+	"wechat_push/models"
 )
 
 const (
@@ -24,12 +25,13 @@ const (
 			  <MsgType><![CDATA[%s]]></MsgType>
 			  <Content><![CDATA[%s]]></Content>
 			</xml>`
+	FROM_USER = ""
 )
 
 var (
-	USER_TXT_FILE = beego.AppConfig.String("user_txt_file")
-	bindMutex     sync.Mutex
-	USERS         = make(map[string]string)
+	UserTxtFile = beego.AppConfig.String("user_txt_file")
+	bindMutex   sync.Mutex
+	USERS       = make(map[string]string)
 )
 
 type MainController struct {
@@ -87,11 +89,27 @@ func createReplay(to, from, msgType, content string) string {
 }
 
 func (this *MainController) PushMsg() {
-
+	respMsg := "推送失败"
+	key := this.GetString("key")
+	msg := this.GetString("msg")
+	desc := this.GetString("desc")
+	if to, ok := USERS[key]; !ok {
+		b, s := models.PushMsg(msg, desc, to)
+		if b {
+			this.Data["json"] = map[string]interface{}{"status": 1, "msg": "推送成功"}
+			this.ServeJSON()
+			this.StopRun()
+		}
+		respMsg = s
+	} else {
+		respMsg = "请先绑定微信号"
+	}
+	this.Data["json"] = map[string]interface{}{"status": -1, "msg": respMsg}
+	this.ServeJSON()
 }
 
 func UserInit() {
-	bytes, _ := ioutil.ReadFile(USER_TXT_FILE)
+	bytes, _ := ioutil.ReadFile(UserTxtFile)
 	_ = json.Unmarshal(bytes, &USERS)
 }
 
@@ -101,15 +119,17 @@ func command(cmd, from, msg string) string {
 		bindMutex.Lock()
 		defer bindMutex.Unlock()
 		USERS[from] = sh1(from)
+		USERS[USERS[from]] = from
 		bytes, _ := json.Marshal(USERS)
-		ioutil.WriteFile(USER_TXT_FILE, bytes, os.ModeAppend)
+		ioutil.WriteFile(UserTxtFile, bytes, os.ModeAppend)
 		return "绑定成功"
 	case "解绑":
 		bindMutex.Lock()
 		defer bindMutex.Unlock()
+		delete(USERS, USERS[from])
 		delete(USERS, from)
 		bytes, _ := json.Marshal(USERS)
-		ioutil.WriteFile(USER_TXT_FILE, bytes, os.ModeAppend)
+		ioutil.WriteFile(UserTxtFile, bytes, os.ModeAppend)
 		return "解绑成功"
 	case "获取":
 		if data, ok := USERS[from]; ok {

@@ -17,7 +17,7 @@ var (
 	pushMessageUrl = beego.AppConfig.String("push_message_url")
 )
 
-type AccessToKen struct {
+type AccessToKenResp struct {
 	AccessToKen string
 	expiresIn   int
 }
@@ -30,7 +30,7 @@ type PushMsgResp struct {
 
 func RefreshAccessToken() {
 	log.Println("start get access_token...")
-	var accessToken AccessToKen
+	var accessToken AccessToKenResp
 	grantType := beego.AppConfig.String("access_token_grant_type")
 	appid := beego.AppConfig.String("access_token_appid")
 	secret := beego.AppConfig.String("access_token_secret")
@@ -45,7 +45,7 @@ func RefreshAccessToken() {
 	body, _ := ioutil.ReadAll(response.Body)
 	json.Unmarshal(body, &accessToken)
 	AccessToken = accessToken.AccessToKen
-	log.Println("get access_token end. access_token %s", accessToken)
+	log.Println("get access_token end. access_token %s", AccessToken)
 }
 
 func PushMsg(msg, desc, to string) (bool, string) {

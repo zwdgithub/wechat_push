@@ -81,7 +81,7 @@ func (this *MainController) Message() {
 		this.Ctx.WriteString(replay)
 	} else if msg.MsgType == "event" {
 		if msg.Event == "subscribe" {
-			this.Ctx.WriteString("欢迎关注: \n 绑定：绑定微信号\n解绑：解绑微信号\n获取：绑定后获取key")
+			this.Ctx.WriteString(createReplay(msg.FromUserName, msg.ToUserName, "text", "欢迎关注: \n 绑定：绑定微信号\n解绑：解绑微信号\n获取：绑定后获取key"))
 		} else if msg.Event == "unsubscribe" {
 			command("解绑", msg.FromUserName, "")
 			this.Ctx.WriteString("")

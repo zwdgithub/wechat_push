@@ -46,6 +46,7 @@ type Message struct {
 	Content      string
 	MsgId        string
 	Event        string
+	EventKey     string
 }
 
 /**
@@ -73,6 +74,7 @@ func (this *MainController) Message() {
 		log.Fatalln("Message xml build error")
 	}
 	log.Printf("user openid is %s,  msg is %s", msg.FromUserName, msg.Content)
+	log.Println(msg)
 	if msg.MsgType == "text" {
 		reMsg := command(msg.Content, msg.FromUserName, "")
 		replay := createReplay(msg.FromUserName, msg.ToUserName, "text", reMsg)

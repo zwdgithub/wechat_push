@@ -3,12 +3,12 @@ package models
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -40,9 +40,10 @@ func RefreshAccessToken() {
 	param.Add("grant_type", grantType)
 	param.Add("appid", appid)
 	param.Add("secret", secret)
-	request, _ := http.NewRequest("GET", accessTokenUrl, strings.NewReader(param.Encode()))
+	request, _ := http.NewRequest("GET", fmt.Sprintf(accessTokenUrl, appid, secret), nil)
 	response, _ := client.Do(request)
 	body, _ := ioutil.ReadAll(response.Body)
+	log.Println(string(body))
 	json.Unmarshal(body, &accessToken)
 	AccessToken = accessToken.AccessToKen
 	log.Println("get access_token end. access_token %s", AccessToken)

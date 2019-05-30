@@ -45,6 +45,7 @@ type Message struct {
 	MsgType      string
 	Content      string
 	MsgId        string
+	Event        string
 }
 
 /**
@@ -71,9 +72,17 @@ func (this *MainController) Message() {
 		log.Fatalln("Message xml build error")
 	}
 	log.Printf("user openid is %s,  msg is %s", msg.FromUserName, msg.Content)
-	reMsg := command(msg.Content, msg.FromUserName, "")
-	replay := createReplay(msg.FromUserName, msg.ToUserName, "text", reMsg)
-	this.Ctx.WriteString(replay)
+	if msg.MsgType == "text" {
+		reMsg := command(msg.Content, msg.FromUserName, "")
+		replay := createReplay(msg.FromUserName, msg.ToUserName, "text", reMsg)
+		this.Ctx.WriteString(replay)
+	} else if msg.MsgType == "event" {
+		if msg.Event == "subscribe" {
+			this.Ctx.WriteString("欢迎关注: \n 绑定：绑定微信号\n解绑：解绑微信号\n获取：绑定后获取key")
+		} else if msg.Event == "unsubscribe" {
+			command("解绑", msg.FromUserName, "")
+		}
+	}
 }
 
 //根据 timestamp, nonce 生成signature

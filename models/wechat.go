@@ -18,14 +18,14 @@ var (
 )
 
 type AccessToKenResp struct {
-	AccessToKen string
-	expiresIn   int
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
 }
 
 type PushMsgResp struct {
-	Errcode int
-	Errmsg  string
-	Msgid   int
+	Errcode int    `json:"errcode"`
+	Errmsg  string `json:"errmsg"`
+	Msgid   int    `json:"msgid"`
 }
 
 func RefreshAccessToken() {
@@ -44,9 +44,12 @@ func RefreshAccessToken() {
 	response, _ := client.Do(request)
 	body, _ := ioutil.ReadAll(response.Body)
 	log.Println(string(body))
-	json.Unmarshal(body, &accessToken)
-	AccessToken = accessToken.AccessToKen
-	log.Println("get access_token end. access_token %s", AccessToken)
+	err := json.Unmarshal(body, &accessToken)
+	if err != nil {
+		log.Println(err)
+	}
+	AccessToken = accessToken.AccessToken
+	log.Printf("get access_token end. access_token %s", AccessToken)
 }
 
 func PushMsg(msg, desc, to string) (bool, string) {
@@ -89,7 +92,7 @@ func PushMsg(msg, desc, to string) (bool, string) {
 	var resp PushMsgResp
 	body, _ := ioutil.ReadAll(response.Body)
 	json.Unmarshal(body, &resp)
-	log.Println(body)
+	log.Println(string(body))
 	if resp.Errcode != 0 {
 		log.Printf("push message failed -> msg: %s, desc: %s, to: %s", msg, desc, to)
 		return false, "推送失败"

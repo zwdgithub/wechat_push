@@ -11,7 +11,6 @@ import (
 
 func main() {
 	controllers.UserInit()
-	models.RefreshAccessToken()
 	tk1 := toolbox.NewTask("tk1", "0 55 * * * *", func() error { models.RefreshAccessToken(); return nil })
 	err := tk1.Run()
 	if err != nil {

@@ -45,7 +45,7 @@ func RefreshAccessToken() {
 	body, _ := ioutil.ReadAll(response.Body)
 	json.Unmarshal(body, &accessToken)
 	AccessToken = accessToken.AccessToKen
-	log.Println("get access_token end...")
+	log.Println("get access_token end. access_token %s", accessToken)
 }
 
 func PushMsg(msg, desc, to string) (bool, string) {
@@ -88,6 +88,7 @@ func PushMsg(msg, desc, to string) (bool, string) {
 	var resp PushMsgResp
 	body, _ := ioutil.ReadAll(response.Body)
 	json.Unmarshal(body, &resp)
+	log.Println(body)
 	if resp.Errcode != 0 {
 		log.Printf("push message failed -> msg: %s, desc: %s, to: %s", msg, desc, to)
 		return false, "推送失败"

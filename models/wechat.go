@@ -78,7 +78,7 @@ func PushMsg(msg, desc, to string) (bool, string) {
 	}
 	param, _ := json.Marshal(data)
 	reader := bytes.NewReader(param)
-	request, _ := http.NewRequest("POST", pushMessageUrl, reader)
+	request, _ := http.NewRequest("POST", pushMessageUrl+AccessToken, reader)
 	response, err := client.Do(request)
 	if err != nil {
 		log.Printf("message push failed : %s", err)

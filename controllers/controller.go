@@ -93,7 +93,7 @@ func (this *MainController) PushMsg() {
 	key := this.GetString("key")
 	msg := this.GetString("msg")
 	desc := this.GetString("desc")
-	if to, ok := USERS[key]; !ok {
+	if to, ok := USERS[key]; ok {
 		b, s := models.PushMsg(msg, desc, to)
 		if b {
 			this.Data["json"] = map[string]interface{}{"status": 1, "msg": "推送成功"}
@@ -110,6 +110,7 @@ func (this *MainController) PushMsg() {
 
 func UserInit() {
 	bytes, _ := ioutil.ReadFile(UserTxtFile)
+	fmt.Println(string(bytes))
 	_ = json.Unmarshal(bytes, &USERS)
 }
 

@@ -87,6 +87,7 @@ func (this *MainController) Message() {
 			this.Ctx.WriteString("")
 		}
 	}
+	this.Ctx.WriteString("你在说啥，我听不清？")
 }
 
 //根据 timestamp, nonce 生成signature

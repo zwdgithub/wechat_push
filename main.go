@@ -11,11 +11,10 @@ import (
 
 func main() {
 	controllers.UserInit()
+	models.RefreshAccessToken()
 	tk1 := toolbox.NewTask("tk1", "0 55 * * * *", func() error { models.RefreshAccessToken(); return nil })
-	err := tk1.Run()
-	if err != nil {
-		log.Fatalln("task run failed ...")
-	}
+	toolbox.AddTask("tk1", tk1)
+	toolbox.StartTask()
 	beego.Run()
 	log.Println("server start success...")
 }
